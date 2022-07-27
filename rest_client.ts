@@ -1,5 +1,6 @@
 import { BufReader } from "https://deno.land/std@0.63.0/io/bufio.ts";
 import { encode } from "https://deno.land/std@0.63.0/encoding/base64.ts";
+import { writeAll } from "https://deno.land/std@0.149.0/streams/conversion.ts";
 
 export type PasswordCredential = {
   name: string;
@@ -84,7 +85,7 @@ export async function exchange(
 
   const requestMessage = makeRequestMessage(request, endpointUrl);
   //console.debug(requestMessage);
-  await Deno.writeAll(conn, new TextEncoder().encode(requestMessage));
+  await writeAll(conn, new TextEncoder().encode(requestMessage));
   const response = await makeResponse(reader);
   conn.close();
   return response;
@@ -126,7 +127,7 @@ async function connectProxy(
 
   //console.debug(connectRequest);
   const decoder = new TextDecoder("utf-8");
-  await Deno.writeAll(conn, new TextEncoder().encode(connectRequest));
+  await writeAll(conn, new TextEncoder().encode(connectRequest));
   const statusLine = await reader.readLine();
   if (statusLine) {
     //console.debug(decoder.decode(statusLine.line));
